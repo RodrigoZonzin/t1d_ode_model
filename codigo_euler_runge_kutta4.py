@@ -3,6 +3,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from parameters_pops import *
+
+
+def K1(G_param): 
+    return G_param**2 / (G_param**2 + paper_parameters['Ghb']**2)
+
+def K2(E_param, R_param):
+    return (paper_parameters['sE']*E_param)**2 / (1 +  (paper_parameters['sE']*E_param)**2 + (paper_parameters['SR']*R_param)**2)
+
+
+#Apoptotic wave at 9 days
+def W(B_param, t_param): 
+    return np.exp(0.1*B_param, -((t_param-9)/9)**2)
 
 def ode_system(t, u, constants):
     """
@@ -10,10 +23,69 @@ def ode_system(t, u, constants):
     t: discrete time step value
     y: state vector (vetor das variaveis/populacoes do modelo)
     """
-    r = constants[0]
-    N = u[0]
     
-    dNdt = r*N 
+    """
+    parametros do modelo: 
+    "J", "k", "b", "c", "fM", "e1", "e2", "alphaB", "sigmaB", "etha", "Ghb", "sE", "sR",
+    "Bconv", "Qpanc", "d", "fMa", "ftD", "Dss", "fD", "R0", "G0", "SI", "sigmaI",
+    "GI", "deltaI", "bDE", "muD", "bIR", "aE", "Tnaive", "Qspleen", "bp", "thetaD",
+    "ram", "bE", "muE", "aR", "bR", "muR", "aEm"
+    """
+    J       = paper_parameters['J']
+    k       = paper_parameters['k']
+    b       = paper_parameters['b']
+    c       = paper_parameters['c']
+    fM      = paper_parameters['fM']
+    e1      = paper_parameters['e1']
+    e2      = paper_parameters['e2']
+    alphaB  = paper_parameters['alphaB']
+    sigmaB  = paper_parameters['sigmaB']
+    etha    = paper_parameters['etha']
+    Ghb     = paper_parameters['Ghb']
+    sE      = paper_parameters['sE']
+    sr      = paper_parameters['sR']
+    Bconv   = paper_parameters['Bconv']
+    Qpanc   = paper_parameters['Qpanc']
+    d       = paper_parameters['d']
+    fMa     = paper_parameters['fMa']
+    ftD     = paper_parameters['ftD']
+    Dss     = paper_parameters['Dss']
+    fD      = paper_parameters['fD']
+    R0      = paper_parameters['R0']
+    G0      = paper_parameters['G0']
+    SI      = paper_parameters['SI']
+    sigmaI  = paper_parameters['sigmaI']
+    GI      = paper_parameters['GI']
+    deltaI  = paper_parameters['deltaI']
+    bDE     = paper_parameters['bDE']
+    muD     = paper_parameters['muD']
+    bIR     = paper_parameters['bIR']
+    aE      = paper_parameters['aE']
+    Tnaive  = paper_parameters['Tnaive']
+    Qspleen = paper_parameters['Qspleen']
+    bp      = paper_parameters['bp']
+    thetaD  = paper_parameters['thetaD']
+    ram     = paper_parameters['ram']
+    bE      = paper_parameters['bE']
+    muE     = paper_parameters['muE']
+    aR      = paper_parameters['aR']
+    bR      = paper_parameters['bR']
+    muR     = paper_parameters['muR']
+    aEm     = paper_parameters['aEm']
+
+
+    """Equacoes do modelo"""
+    #Macrophage population
+    dMdt = J + (k+b)*Ma -c*M -fM*M*Ba -fM*M*Bn -e1*M*(M+Ma)
+
+    #Activated Macrophage pop 
+    dMadt = fM*M*Ba + fm*M*Bn -e2*Ma*(M+Ma)
+
+
+
+
+
+
     return np.array([dNdt])
 
 def rk4(f, tk, _uk, _dt=0.01, **kwargs):
@@ -51,7 +123,7 @@ def solveSystem(time, dt, y0, method):
     t = 0
     yk = y0
     state = []
-    parameters = [0.1]
+    parameters = paper_parameters.values()
 
     if method == "euler":
         for t in time:
@@ -85,7 +157,7 @@ def plot(time, state, names):
     plt.show()
 
 if __name__ == "__main__":
-    names = ['N']
+    names = ['B', 'G', 'I', 'M', 'Ma', 'Ba', 'Bn', 'D', 'tD', 'E', 'R', 'Em']
     dt = 0.01
     tfinal = 50
     time = np.arange(0, tfinal + dt, dt)

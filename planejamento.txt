@@ -1,0 +1,17 @@
+
+Introdução
+    Aspectos biológicos da Diabetes
+    Impactos da diabetes na saúde humana (cancer, covid etc)
+    Incidência/Taxas de diabetes no mundo 
+    Incidência/Taxas de diabetes no Brasil (estados e cidades)
+    Revisão sobre modelos matemáticos na literatura 
+    
+Metodologia
+    Modelo que embasará nosso trabalho 
+    Adaptações
+    Implementação e métodos para as simulações numéricas 
+    Obtenção dos dados experimentais (se tiver)
+
+Resultados
+Conclusão
+Discussão

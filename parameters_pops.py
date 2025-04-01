@@ -9,7 +9,7 @@ paper_parameters = {
     "e1": 1e-8,         # cell−1 d−1 - anti-crowding term for macrophages
     "e2": 1e-8,         # cell−1 d−1 - anti-crowding term for macrophages
     "alphaB": 0.0334,   # d−1 - β-cell growth rate
-    "deltaB": 1/60,     # d−1 - β-cell death rate
+    "sigmaB": 1/60,     # d−1 - β-cell death rate
     "etha": 0.02,       # d−1 - rate at which T-cells eliminate β-cells
     "Ghb": 90,          # mg dl−1 - glucose level of half-max β-cell production
     "sE": 1,            # ml cells−1 - Relative impact of effector T-cells on β-cell death
@@ -44,3 +44,17 @@ paper_parameters = {
     "aEm": 0.01         # d−1 - memory T-cell death rate
 }
 
+initial_values = {
+    'M': 0.,
+    'Ma': 0., 
+    'B': 300, 
+    'Ba': 0, 
+    'Bn': 0, 
+    'G': 100, 
+    'I': 10, 
+    'D': 0, 
+    'tD': 0, 
+    'E': 0, 
+    'R': 0, 
+    'Em': 0
+}

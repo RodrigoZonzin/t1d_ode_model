@@ -10,11 +10,12 @@ def K1(G_param):
     return G_param**2 / (G_param**2 + paper_parameters['Ghb']**2)
 
 def K2(E_param, R_param):
-    return (paper_parameters['sE']*E_param)**2 / (1 +  (paper_parameters['sE']*E_param)**2 + (paper_parameters['SR']*R_param)**2)
+    return (paper_parameters['sE']*E_param)**2 / (1 +  (paper_parameters['sE']*E_param)**2 + (paper_parameters['sR']*R_param)**2)
 
 #Apoptotic wave at 9 days
 def W(B_param, t_param): 
-    return np.exp(0.1*B_param, -((t_param-9)/9)**2)
+    print(B_param, t_param)
+    return 0.1 * B_param * np.exp(-((t_param - 9) / 9) ** 2)
 
 def ode_system(t, u, constants):
     """
@@ -76,6 +77,7 @@ def ode_system(t, u, constants):
 
 
     """Variaveis do modelo"""
+    
     M   = u[0]
     Ma  = u[1]
     B   = u[2]
@@ -98,11 +100,11 @@ def ode_system(t, u, constants):
     dMadt = fM*M*Ba + fM*M*Bn -e2*Ma*(M+Ma)
     
     #Healthy beta cells (3)
-    dBdt = alphaB*K1(G)*B -deltaB*B -etha*K2(E,R)*B -W(B,t)
+    dBdt = alphaB*K1(G)*B -sigmaB*B -etha*K2(E,R)*B -W(B,t)
 
     #Apoptotic beta cells (4)
     conv_cte = Bconv/Qpanc
-    dBadt = (sigmaB*conv_cte)*B + (etha*conv_cte)*Ke(E,R)*B +(W*conv_cte) -d*Ba -fM*M*Ba - fMa*Ma*Ba -ftD(Dss - D)*Ba -fD*D*Ba
+    dBadt = (sigmaB*conv_cte)*B + (etha*conv_cte)*K2(E,R)*B +(W(B,t)*conv_cte) -d*Ba -fM*M*Ba - fMa*Ma*Ba -ftD*(Dss - D)*Ba -fD*D*Ba
 
     #Necrotic beta cells (5)
     dBndt = d*Ba -fM*M*Bn -fMa*Ma*Bn -ftD*(Dss - D)*Bn -fD*D*Bn
@@ -114,10 +116,10 @@ def ode_system(t, u, constants):
     dIdt = deltaI * (G**2/(G**2 + G*I**2))*B -sigmaI*I
 
     #Immunogenic Dendritic Cells (8)
-    dDdt = ftD*Bn(Dss -D -tD) +ftD*Bn*t*D -bDE*E*D -muD*D
+    dDdt = ftD*Bn*(Dss -D -tD) +ftD*Bn*t*D -bDE*E*D -muD*D
 
     #Tolerogenic Dendritic Cells (9)
-    dtDdt = ftD*Ba(Dss-D-t*D) -ftD*Bn*t*D -bIR*R*t*D -muD*t*D
+    dtDdt = ftD*Ba*(Dss-D-t*D) -ftD*Bn*t*D -bIR*R*t*D -muD*t*D
 
     #Effector T-cells (10)
     dEdt = aE*(Tnaive/Qspleen - E) +bp*(D*E/(thetaD+D)) -ram*E +bE*D*Em -muE*E*R
@@ -167,6 +169,7 @@ def solveSystem(time, dt, y0, method):
     yk = y0
     state = []
     parameters = paper_parameters.values()
+    #print(parameters)
 
     if method == "euler":
         for t in time:
@@ -183,7 +186,7 @@ def solveSystem(time, dt, y0, method):
 def save(time, state, names):
     df = pd.DataFrame(state, columns = names)
     df.insert(0, 'time', time)
-    df.to_csv('results.csv', float_format='%.5f', sep=',')
+    df.to_csv('results.csv', float_format='%.5f', sep=',', index=False)
 
 def plot(time, state, names):
     fig, ax = plt.subplots()
@@ -196,15 +199,16 @@ def plot(time, state, names):
     #ax.plot(time2, sol, label='solucao analitica', linewidth='2')
     ax.set(xlabel='dias', ylabel='populacao')
     plt.legend(loc='best')
-    fig.savefig('exponencial.png', format='png')
+    fig.savefig('ode_t1d.png', format='png')
     plt.show()
 
 if __name__ == "__main__":
     names = ['M', 'Ma', 'B', 'Ba', 'Bn', 'G', 'I', 'D', 'tD', 'E', 'R', 'Em']
-    dt = 0.01
-    tfinal = 50
+    dt = 1
+    tfinal = 500
     time = np.arange(0, tfinal + dt, dt)
-    initial_condition = np.array([2])
+    initial_condition = list(initial_values.values())
+    
     result = solveSystem(time, dt, initial_condition, "rk4")
     save(time, result, names)
     plot(time, result, names)

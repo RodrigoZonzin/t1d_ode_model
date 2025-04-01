@@ -12,7 +12,6 @@ def K1(G_param):
 def K2(E_param, R_param):
     return (paper_parameters['sE']*E_param)**2 / (1 +  (paper_parameters['sE']*E_param)**2 + (paper_parameters['SR']*R_param)**2)
 
-
 #Apoptotic wave at 9 days
 def W(B_param, t_param): 
     return np.exp(0.1*B_param, -((t_param-9)/9)**2)
@@ -24,6 +23,8 @@ def ode_system(t, u, constants):
     y: state vector (vetor das variaveis/populacoes do modelo)
     """
     
+
+
     """
     parametros do modelo: 
     "J", "k", "b", "c", "fM", "e1", "e2", "alphaB", "sigmaB", "etha", "Ghb", "sE", "sR",
@@ -56,7 +57,7 @@ def ode_system(t, u, constants):
     SI      = paper_parameters['SI']
     sigmaI  = paper_parameters['sigmaI']
     GI      = paper_parameters['GI']
-    deltaI  = paper_parameters['deltaI']/
+    deltaI  = paper_parameters['deltaI']
     bDE     = paper_parameters['bDE']
     muD     = paper_parameters['muD']
     bIR     = paper_parameters['bIR']
@@ -74,6 +75,21 @@ def ode_system(t, u, constants):
     aEm     = paper_parameters['aEm']
 
 
+    """Variaveis do modelo"""
+    M   = u[0]
+    Ma  = u[1]
+    B   = u[2]
+    Ba  = u[3]
+    Bn  = u[4]
+    G   = u[5]
+    I   = u[6]
+    D   = u[7]
+    tD  = u[8]
+    E   = u[9]
+    R   = u[10]
+    Em  = u[11]
+
+
     """Equacoes do modelo"""
     #Macrophage population (1)
     dMdt = J + (k+b)*Ma -c*M -fM*M*Ba -fM*M*Bn -e1*M*(M+Ma)
@@ -82,7 +98,7 @@ def ode_system(t, u, constants):
     dMadt = fM*M*Ba + fM*M*Bn -e2*Ma*(M+Ma)
     
     #Healthy beta cells (3)
-    dBdt = alphaB*K1(G)*B -deltaB*B -etha*k2(E,R)*B -W(B,t)
+    dBdt = alphaB*K1(G)*B -deltaB*B -etha*K2(E,R)*B -W(B,t)
 
     #Apoptotic beta cells (4)
     conv_cte = Bconv/Qpanc
@@ -184,7 +200,7 @@ def plot(time, state, names):
     plt.show()
 
 if __name__ == "__main__":
-    names = ['B', 'G', 'I', 'M', 'Ma', 'Ba', 'Bn', 'D', 'tD', 'E', 'R', 'Em']
+    names = ['M', 'Ma', 'B', 'Ba', 'Bn', 'G', 'I', 'D', 'tD', 'E', 'R', 'Em']
     dt = 0.01
     tfinal = 50
     time = np.arange(0, tfinal + dt, dt)

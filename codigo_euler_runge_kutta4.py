@@ -56,7 +56,7 @@ def ode_system(t, u, constants):
     SI      = paper_parameters['SI']
     sigmaI  = paper_parameters['sigmaI']
     GI      = paper_parameters['GI']
-    deltaI  = paper_parameters['deltaI']
+    deltaI  = paper_parameters['deltaI']/
     bDE     = paper_parameters['bDE']
     muD     = paper_parameters['muD']
     bIR     = paper_parameters['bIR']
@@ -75,18 +75,45 @@ def ode_system(t, u, constants):
 
 
     """Equacoes do modelo"""
-    #Macrophage population
+    #Macrophage population (1)
     dMdt = J + (k+b)*Ma -c*M -fM*M*Ba -fM*M*Bn -e1*M*(M+Ma)
 
-    #Activated Macrophage pop 
-    dMadt = fM*M*Ba + fm*M*Bn -e2*Ma*(M+Ma)
+    #Activated Macrophage pop (2)
+    dMadt = fM*M*Ba + fM*M*Bn -e2*Ma*(M+Ma)
+    
+    #Healthy beta cells (3)
+    dBdt = alphaB*K1(G)*B -deltaB*B -etha*k2(E,R)*B -W(B,t)
 
+    #Apoptotic beta cells (4)
+    conv_cte = Bconv/Qpanc
+    dBadt = (sigmaB*conv_cte)*B + (etha*conv_cte)*Ke(E,R)*B +(W*conv_cte) -d*Ba -fM*M*Ba - fMa*Ma*Ba -ftD(Dss - D)*Ba -fD*D*Ba
 
+    #Necrotic beta cells (5)
+    dBndt = d*Ba -fM*M*Bn -fMa*Ma*Bn -ftD*(Dss - D)*Bn -fD*D*Bn
 
+    #Glucose (6)
+    dGdt = R0 - (G0+SI*I)*G
 
+    #Insulin (7)
+    dIdt = deltaI * (G**2/(G**2 + G*I**2))*B -sigmaI*I
 
+    #Immunogenic Dendritic Cells (8)
+    dDdt = ftD*Bn(Dss -D -tD) +ftD*Bn*t*D -bDE*E*D -muD*D
 
-    return np.array([dNdt])
+    #Tolerogenic Dendritic Cells (9)
+    dtDdt = ftD*Ba(Dss-D-t*D) -ftD*Bn*t*D -bIR*R*t*D -muD*t*D
+
+    #Effector T-cells (10)
+    dEdt = aE*(Tnaive/Qspleen - E) +bp*(D*E/(thetaD+D)) -ram*E +bE*D*Em -muE*E*R
+
+    #Regulatory T-cells (11)
+    dRdt = aR*(Tnaive/Qspleen - R) +bp*(t*D*R/(thetaD+t*D)) -ram*R +bR*t*D*Em - muR*E*R
+
+    #Memory T-cells (12)
+    dEmdt = ram*(E+R) -(aEm +bE*D +bR*t*D)*Em 
+    
+
+    return np.array([dMdt, dMadt, dBdt, dBadt, dBndt, dGdt, dIdt, dDdt, dtDdt, dEdt, dRdt, dEmdt])
 
 def rk4(f, tk, _uk, _dt=0.01, **kwargs):
     """

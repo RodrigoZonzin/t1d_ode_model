@@ -9,13 +9,14 @@ from parameters_pops import *
 def K1(G_param): 
     return G_param**2 / (G_param**2 + paper_parameters['Ghb']**2)
 
+#trocar ** para multiplicacao 
 def K2(E_param, R_param):
     return (paper_parameters['sE']*E_param)**2 / (1 +  (paper_parameters['sE']*E_param)**2 + (paper_parameters['sR']*R_param)**2)
 
 #Apoptotic wave at 9 days
 def W(B_param, t_param): 
-    print(B_param, t_param)
-    return 0.1 * B_param * np.exp(-((t_param - 9) / 9) ** 2)
+    #print(B_param, t_param)
+    return 0.1 * B_param * np.exp(-(((t_param - 9) / 9) ** 2))
 
 def ode_system(t, u, constants):
     """
@@ -204,8 +205,8 @@ def plot(time, state, names):
 
 if __name__ == "__main__":
     names = ['M', 'Ma', 'B', 'Ba', 'Bn', 'G', 'I', 'D', 'tD', 'E', 'R', 'Em']
-    dt = 1
-    tfinal = 500
+    dt = 0.00001
+    tfinal = 10
     time = np.arange(0, tfinal + dt, dt)
     initial_condition = list(initial_values.values())
     

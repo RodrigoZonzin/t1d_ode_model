@@ -44,7 +44,7 @@ paper_parameters = {
     "aEm": 0.01         # d−1 - memory T-cell death rate
 }
 
-initial_values = {
+paper_initial_values = {
     'M': 0.,
     'Ma': 0., 
     'B': 300, 

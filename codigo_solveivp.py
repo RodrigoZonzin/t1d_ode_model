@@ -1,19 +1,29 @@
-import argparse, contextlib, sys, ois
+import argparse, contextlib, sys, os
 import scipy
 import numpy as np
 
+from parameters_pops import *
+
+
 
 def initial_values() -> np.ndarray:
-    N_0 = 10.0
-    return np.array((
-        N_0,
-        ))
+    return list(paper_initial_values.values())
 
 def constants() -> list:
-    r = 0.1
-    return [
-        r,
-        ]
+    return paper_parameters
+
+
+def K1(G_param):
+    return G_param**2 / (G_param**2 + paper_parameters['Ghb']**2)
+
+#trocar ** para multiplicacao 
+def K2(E_param, R_param):
+    return (paper_parameters['sE']*E_param)**2 / (1 +  (paper_parameters['sE']*E_param)**2 + (paper_parameters['sR']*R_param)**2)
+
+#Apoptotic wave at 9 days
+def W(B_param, t_param):
+    #print(B_param, t_param)
+    return 0.1 * B_param * np.exp(-(((t_param - 9) / 9) ** 2))
 
 
 def constants_with_names() -> list:
@@ -58,7 +68,7 @@ def constants_with_names() -> list:
         ('aR', 0.1199), 
         ('bR', 0.001), 
         ('muR', 2e-06), 
-        ('aEm', 0.01)]              ]
+        ('aEm', 0.01)]              
     return constants_list
 
 
@@ -95,7 +105,6 @@ def system(t: np.float64, u: np.ndarray, *constants) -> np.ndarray:
     Em  = u[11]
 
     #constants
-    r = constants
     J       = paper_parameters['J']
     k       = paper_parameters['k']
     b       = paper_parameters['b']
@@ -139,13 +148,12 @@ def system(t: np.float64, u: np.ndarray, *constants) -> np.ndarray:
     aEm     = paper_parameters['aEm']    
 
 
-
     """Equacoes do modelo"""
     #Macrophage population (1)
     dMdt = J + (k+b)*Ma -c*M -fM*M*Ba -fM*M*Bn -e1*M*(M+Ma)
 
     #Activated Macrophage pop (2)
-    dMadt = fM*M*Ba + fM*M*Bn -e2*Ma*(M+Ma)
+    dMadt = fM*M*Ba +fM*M*Bn -k*Ma -e2*Ma*(M+Ma)
 
     #Healthy beta cells (3)
     dBdt = alphaB*K1(G)*B -sigmaB*B -etha*K2(E,R)*B -W(B,t)
@@ -167,16 +175,16 @@ def system(t: np.float64, u: np.ndarray, *constants) -> np.ndarray:
     dDdt = ftD*Bn*(Dss -D -tD) +ftD*Bn*t*D -bDE*E*D -muD*D
 
     #Tolerogenic Dendritic Cells (9)
-    dtDdt = ftD*Ba*(Dss-D-t*D) -ftD*Bn*t*D -bIR*R*t*D -muD*t*D
+    dtDdt = ftD*Ba*(Dss-D-tD) -ftD*Bn*tD -bIR*R*tD -muD*tD
 
     #Effector T-cells (10)
     dEdt = aE*(Tnaive/Qspleen - E) +bp*(D*E/(thetaD+D)) -ram*E +bE*D*Em -muE*E*R
 
     #Regulatory T-cells (11)
-    dRdt = aR*(Tnaive/Qspleen - R) +bp*(t*D*R/(thetaD+t*D)) -ram*R +bR*t*D*Em - muR*E*R
+    dRdt = aR*(Tnaive/Qspleen - R) +bp*(t*D*R/(thetaD+t*D)) -ram*R +bR*tD*Em - muR*E*R
 
     #Memory T-cells (12)
-    dEmdt = ram*(E+R) -(aEm +bE*D +bR*t*D)*Em
+    dEmdt = ram*(E+R) -(aEm +bE*D +bR*tD)*Em
 
     return np.array([dMdt, dMadt, dBdt, dBadt, dBndt, dGdt, dIdt, dDdt, dtDdt, dEdt, dRdt, dEmdt])
 
@@ -259,7 +267,7 @@ def update_constants_with_params(constants, params):
     return updated_constants
 
 
-def simulate(filename, st=0, tf=50, dt=0.1, plot=False, x_label="time (days)", y_label="conc/ml", params={}):
+def simulate(filename, st=0, tf=50, dt=0.1, plot=False, x_label="time (days)", y_label="populacao", params={}):
     sim_steps = np.arange(st, tf + dt, dt)
 
     constants_values = [value for _, value in update_constants_with_params(constants_with_names(), params)]
@@ -286,7 +294,7 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output", default=None)
     parser.add_argument("--csv", action=argparse.BooleanOptionalAction)
     parser.add_argument("--xlabel", type=str, default="time (days)")
-    parser.add_argument("--ylabel", type=str, default="conc/ml")
+    parser.add_argument("--ylabel", type=str, default="populacao")
     parser.add_argument("--params", type=str, default="")
 
     args = parser.parse_args()

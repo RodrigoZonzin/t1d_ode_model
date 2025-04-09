@@ -4,4 +4,4 @@ push:
 	git push
 
 run_solve: 
-	python3 codigo_solveivp.py
+	python3 codigo_solveivp.py -o resultados.pdf

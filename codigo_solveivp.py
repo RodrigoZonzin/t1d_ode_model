@@ -267,7 +267,7 @@ def update_constants_with_params(constants, params):
     return updated_constants
 
 
-def simulate(filename, st=0, tf=50, dt=0.1, plot=False, x_label="time (days)", y_label="populacao", params={}):
+def simulate(filename, st=0, tf=100000, dt=0.1, plot=False, x_label="time (days)", y_label="populacao", params={}):
     sim_steps = np.arange(st, tf + dt, dt)
 
     constants_values = [value for _, value in update_constants_with_params(constants_with_names(), params)]

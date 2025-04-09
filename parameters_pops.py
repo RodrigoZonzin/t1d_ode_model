@@ -5,7 +5,7 @@ paper_parameters = {
     "k": 0.4,           # d−1 - Ma deactivation rate
     "b": 0.09,          # d−1 - macrophage recruitment rate by Ma
     "c": 0.1,           # d−1 - macrophage egress rate
-    "fM": 0.0623e-5,    # ml cell−1 d−1 - basal phagocytosis rate per M
+    "fM": 2*0.0623e-5,    # ml cell−1 d−1 - basal phagocytosis rate per M
     "e1": 1e-8,         # cell−1 d−1 - anti-crowding term for macrophages
     "e2": 1e-8,         # cell−1 d−1 - anti-crowding term for macrophages
     "alphaB": 0.0334,   # d−1 - β-cell growth rate
@@ -17,7 +17,7 @@ paper_parameters = {
     "Bconv": 2.59e5,    # cell mg−1 - β-cells per milligram
     "Qpanc": 0.194,     # ml - volume of mouse pancreas
     "d": 0.50,          # d−1 - β-cell death rate
-    "fMa": 0.0623e-5,   # ml cells−1 d−1 - activated phagocytosis rate per Ma
+    "fMa": 5*0.0623e-5,   # ml cells−1 d−1 - activated phagocytosis rate per Ma
     "ftD": 1.1899e-6,   # ml cells−1 d−1 - rate naive DC engulf apoptotic β-cells
     "Dss": 1e5,         # cells ml−1 - steady-state DC population
     "fD": 1.7101e-7,    # ml cells−1 d−1 - rate naive DC engulf necrotic β-cells

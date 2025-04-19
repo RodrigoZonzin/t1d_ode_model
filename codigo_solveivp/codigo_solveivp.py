@@ -192,7 +192,7 @@ def system(t: np.float64, u: np.ndarray, *constants) -> np.ndarray:
 # includes! "ode-support.py"
 
 
-def simulatiion_output_to_csv(sim_steps, simulation_output, write_to):
+def simulation_output_to_csv(sim_steps, simulation_output, write_to):
     if not simulation_output.success:
         print(simulation_output.message)
         return
@@ -267,7 +267,7 @@ def update_constants_with_params(constants, params):
     return updated_constants
 
 
-def simulate(filename, st=0, tf=100000, dt=0.1, plot=False, x_label="time (days)", y_label="populacao", params={}):
+def simulate(filename, st=0, tf=100, dt=0.1, plot=False, x_label="time (days)", y_label="populacao", params={}):
     sim_steps = np.arange(st, tf + dt, dt)
 
     constants_values = [value for _, value in update_constants_with_params(constants_with_names(), params)]
@@ -290,7 +290,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--st", type=float, default=0)
     parser.add_argument("--tf", type=float, default=50)
-    parser.add_argument("--dt", type=float, default=0.01)
+    parser.add_argument("--dt", type=float, default=0.001)
     parser.add_argument("-o", "--output", default=None)
     parser.add_argument("--csv", action=argparse.BooleanOptionalAction)
     parser.add_argument("--xlabel", type=str, default="time (days)")

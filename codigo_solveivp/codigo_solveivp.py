@@ -172,10 +172,10 @@ def system(t: np.float64, u: np.ndarray, *constants) -> np.ndarray:
     dIdt = deltaI * (G**2/(G**2 + G*I**2))*B -sigmaI*I
 
     #Immunogenic Dendritic Cells (8)
-    dDdt = ftD*Bn*(Dss -D -tD) +ftD*Bn*t*D -bDE*E*D -muD*D
+    dDdt = ftD*Bn*(Dss - D - tD) +ftD*Bn*t*D -bDE*E*D -muD*D
 
     #Tolerogenic Dendritic Cells (9)
-    dtDdt = ftD*Ba*(Dss-D-tD) -ftD*Bn*tD -bIR*R*tD -muD*tD
+    dtDdt = ftD*Ba*(Dss - D - tD) -ftD*Bn*tD -bIR*R*tD -muD*tD
 
     #Effector T-cells (10)
     dEdt = aE*(Tnaive/Qspleen - E) +bp*(D*E/(thetaD+D)) -ram*E +bE*D*Em -muE*E*R
@@ -267,7 +267,7 @@ def update_constants_with_params(constants, params):
     return updated_constants
 
 
-def simulate(filename, st=0, tf=100, dt=0.1, plot=False, x_label="time (days)", y_label="populacao", params={}):
+def simulate(filename, st=0, tf=100, dt=0.01, plot=False, x_label="time (days)", y_label="populacao", params={}):
     sim_steps = np.arange(st, tf + dt, dt)
 
     constants_values = [value for _, value in update_constants_with_params(constants_with_names(), params)]

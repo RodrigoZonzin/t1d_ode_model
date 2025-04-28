@@ -15,6 +15,6 @@ $\frac{dT_E}{dt} = -\alpha T_{reg} - \mu_{T_{E}}T_E$
 Regulatory T-Cells 
 $\frac{dT_{reg}}{dt} = k_2 + f(T_{reg}, T_E, B, t)$
 
-Atigen Presenting Cells
+Antigen Presenting Cells
 $\frac{dA_{PC}}{dt} = k_3$
 

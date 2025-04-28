@@ -51,8 +51,9 @@ def system(t: np.float64, u: np.ndarray, *constants) -> np.ndarray:
     alphaAPCTE  = paper_parameters['alphaAPCTE']
     muB         = paper_parameters['muB']
     alphaTReg   = paper_parameters['alphaTReg']
-    muTReg      = paper_parameters['muTReg']
+    muTE        = paper_parameters['muTReg']
     k2          = paper_parameters['k2']
+    muTReg      = paper_parameters['muTReg']
     k3          = paper_parameters['k3']
 
     #"Equacoes do Modelo"
@@ -66,10 +67,16 @@ def system(t: np.float64, u: np.ndarray, *constants) -> np.ndarray:
     dBdt = alphaG*G -alphaAPTCTE*TE*APC -muB*B
 
     #Effector T cells
-    dTEdt = -alphaTreg
+    dTEdt = -alphaTreg -muTE*TE
+
+    #Reg T Cells
+    dTRegdt = k2+f(TReg, TE, B, t) -muTReg*TReg
+
+    #Antigen Presenting Cells 
+    dAPCdt = k3
 
 
-    return np.array([dMdt, dMadt, dBdt, dBadt, dBndt, dGdt, dIdt, dDdt, dtDdt, dEdt, dRdt, dEmdt])
+    return np.array([dGdt, dIdt, dBdt, dTEdt, dTRegdt, dAPCdt])
 
 
 # includes! "ode-support.py"

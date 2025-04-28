@@ -44,7 +44,7 @@ def system(t: np.float64, u: np.ndarray, *constants) -> np.ndarray:
     #constants
     k1          = paper_parameters['k1']
     alphaI      = paper_parameters['alphaI']
-    muB         = paper_parameters['muB']
+    muG         = paper_parameters['muG']
     alphaB      = paper_parameters['alphaB']
     muI         = paper_parameters['muI']
     alphaG      = paper_parameters['alphaG']
@@ -55,44 +55,19 @@ def system(t: np.float64, u: np.ndarray, *constants) -> np.ndarray:
     k2          = paper_parameters['k2']
     k3          = paper_parameters['k3']
 
+    #"Equacoes do Modelo"
+    #Glucose
+    dGdt = k1 - alphaI*I -muG*G
 
-    """Equacoes do modelo"""
-    #Macrophage population (1)
-    dMdt = J + (k+b)*Ma -c*M -fM*M*Ba -fM*M*Bn -e1*M*(M+Ma)
+    #Insulin
+    dIdt = alphaB*B - muI*I
 
-    #Activated Macrophage pop (2)
-    dMadt = fM*M*Ba +fM*M*Bn -k*Ma -e2*Ma*(M+Ma)
+    #Beta Cells
+    dBdt = alphaG*G -alphaAPTCTE*TE*APC -muB*B
 
-    #Healthy beta cells (3)
-    dBdt = alphaB*K1(G)*B -sigmaB*B -etha*K2(E,R)*B -W(B,t)
+    #Effector T cells
+    dTEdt = -alphaTreg
 
-    #Apoptotic beta cells (4)
-    conv_cte = Bconv/Qpanc
-    dBadt = (sigmaB*conv_cte)*B + (etha*conv_cte)*K2(E,R)*B +(W(B,t)*conv_cte) -d*Ba -fM*M*Ba - fMa*Ma*Ba -ftD*(Dss - D)*Ba -fD*D*Ba
-
-    #Necrotic beta cells (5)
-    dBndt = d*Ba -fM*M*Bn -fMa*Ma*Bn -ftD*(Dss - D)*Bn -fD*D*Bn
-
-     #Glucose (6)
-    dGdt = R0 - (G0+SI*I)*G
-
-    #Insulin (7)
-    dIdt = deltaI * (G**2/(G**2 + G*I**2))*B -sigmaI*I
-
-    #Immunogenic Dendritic Cells (8)
-    dDdt = ftD*Bn*(Dss - D - tD) +ftD*Bn*t*D -bDE*E*D -muD*D
-
-    #Tolerogenic Dendritic Cells (9)
-    dtDdt = ftD*Ba*(Dss - D - tD) -ftD*Bn*tD -bIR*R*tD -muD*tD
-
-    #Effector T-cells (10)
-    dEdt = aE*(Tnaive/Qspleen - E) +bp*(D*E/(thetaD+D)) -ram*E +bE*D*Em -muE*E*R
-
-    #Regulatory T-cells (11)
-    dRdt = aR*(Tnaive/Qspleen - R) +bp*(t*D*R/(thetaD+t*D)) -ram*R +bR*tD*Em - muR*E*R
-
-    #Memory T-cells (12)
-    dEmdt = ram*(E+R) -(aEm +bE*D +bR*tD)*Em
 
     return np.array([dMdt, dMadt, dBdt, dBadt, dBndt, dGdt, dIdt, dDdt, dtDdt, dEdt, dRdt, dEmdt])
 

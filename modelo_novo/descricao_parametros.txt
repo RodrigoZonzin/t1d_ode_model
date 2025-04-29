@@ -1,0 +1,29 @@
+-Glicose
+RG      aumento constante devido à dieta 
+kG      atuação da insulina, diminuindo os niveis de glicose
+muG     degradacao natural da glicose
+
+
+-Insulina 
+alphaI  aumento da insulina, resposta fisiologica devido ao aumento da glicose
+muI     degradacao natural 
+
+-B
+alphaG  glicose e celulas Beta favorecem o aumento populacional das celulas Beta
+kB      morte celular devido ao ataque autoimune 
+alphaE  saturacao das celulas T-efetoras
+alpha1R saturacao devido às células Treg
+
+-Te 
+sE      conversão das células T disponíveis (Tnaive - Te) em celulas T-efetoras 
+muE     degradacao que ocorre devido ao encontro das células T-efetoras com as células Treg 
+
+-Treg
+sR      Treg aumenta devido à presença de células T-efetoras (ponderado por um fator de saturacao)
+alpha2R controla o aumento da Treg a partir da Te (fator de ponderação do termo anterior)
+muR     degradacao natural de Treg
+
+----------
+muG > RG, kG = 0 ou I = 0  ==> dGdt fica negativo, G começa a diminuir
+
+na eq. dBdt, se alphaE --> 0 e alpha1R --> 0, o termo -kB*B*Te/(1+alphaE*Te+alpha1R*Treg) fica -kB*B*Te/1 = -kB*B*Te

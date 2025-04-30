@@ -1,0 +1,16 @@
+    RG      = 1.
+    kG      = 0.05 #0.72
+    muG     = 0.01
+    alphaI  = 0.01
+    muI     = 1
+    alphaG  = 0.01
+    kB      = 0.0001
+    alphaE  = 0.01
+    alpha1R = 0.01
+    muB     = 0.5
+    sE      = 0.0002*0
+    Tnaive  = 1e6
+    muE     = 0.02
+    sR      = 0.2
+    alpha2R = 0.1
+    muR     = 0.001

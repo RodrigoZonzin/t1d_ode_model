@@ -6,34 +6,34 @@ import numpy as np
 def initial_values() -> np.ndarray:
     G_0   = 80
     I_0   = 20     
-    B_0   = 1e4
-    Te_0  = 1e3
-    Treg_0= 1e3 
+    B_0   = 300
+    Te_0  = 0
+    Treg_0= 0
 
     return np.array((G_0, I_0, B_0, Te_0, Treg_0))
 
 def constants() -> list:
-    RG      = 0.03
-    kG      = 0.0001
-    muG     = 0.0001
-    alphaI  = 0.1
-    muI     = 0.001
+    RG      = 1.
+    kG      = 0.05 #0.72
+    muG     = 0.01
+    alphaI  = 0.01
+    muI     = 1
     alphaG  = 0.01
-    kB      = 0.04
+    kB      = 0.0001
     alphaE  = 0.01
     alpha1R = 0.01
-    muB     = 0.001
-    sE      = 0.02
-    Tnaive  = 1e2
+    muB     = 0.5
+    sE      = 0.0002*0
+    Tnaive  = 1e6
     muE     = 0.02
     sR      = 0.2
-    alpha2R = 0.01
+    alpha2R = 0.1
     muR     = 0.001
 
-    return [RG, kG, muG, alphaI, 
+    return (RG, kG, muG, alphaI, 
             muI, alphaG, kB, alphaE,
             alpha1R, muB, sE, Tnaive, 
-            muE, sR, alpha2R, muR]
+            muE, sR, alpha2R, muR)
 
 
 def constants_with_names() -> list:
@@ -95,10 +95,12 @@ def system(t: np.float64, y: np.ndarray, *constants) -> np.ndarray:
 
 
     #Sistema de EDOs
-    dGdt = RG -kG*I -muG*G
+    #dGdt = RG -kG*I*G -muG*G      #atualiza o termo I*G
+    Gmax = 85
+    dGdt = RG*(Gmax - G) -kG*I*G -muG*G
     dIdt = alphaI*B -muI*I
     dBdt = alphaG*G*B -((kB*B*Te)/((1+alphaE*Te) + (alpha1R*Treg))) -muB*B
-    dTedt = sE*Te*(Tnaive - Te) -muE*Te*Treg
+    dTedt = sE*(Tnaive - Te) -muE*Te*Treg #retira o TE de  sE*Te
     dTregdt = ((sR*Te)/(1+alpha2R*Treg)) -muR*Treg
 
     return np.array([dGdt, dIdt, dBdt, dTedt, dTregdt])
@@ -184,13 +186,13 @@ def update_constants_with_params(constants, params):
 def simulate(filename, st=0, tf=50, dt=0.1, plot=False, x_label="time (days)", y_label="conc/ml", params={}):
     sim_steps = np.arange(st, tf + dt, dt)
 
-    constants_values = [value for _, value in update_constants_with_params(constants_with_names(), params)]
+    #constants_values = [value for _, value in update_constants_with_params(constants_with_names(), params)]
 
     simulation_output = scipy.integrate.solve_ivp(
         fun=system,
         t_span=(st, tf + dt * 2),
         y0=initial_values(),
-        args=tuple(constants_values),
+        args=constants(),
         t_eval=sim_steps,
     )
 

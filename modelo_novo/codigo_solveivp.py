@@ -4,7 +4,7 @@ import numpy as np
 
 
 def initial_values() -> np.ndarray:
-    G_0   = 1000
+    G_0   = 80
     I_0   = 20     
     B_0   = 1e4
     Te_0  = 1e3
@@ -13,9 +13,9 @@ def initial_values() -> np.ndarray:
     return np.array((G_0, I_0, B_0, Te_0, Treg_0))
 
 def constants() -> list:
-    RG      = 0.003
-    kG      = 0.1
-    muG     = 0.001
+    RG      = 0.03
+    kG      = 0.0001
+    muG     = 0.0001
     alphaI  = 0.1
     muI     = 0.001
     alphaG  = 0.01
@@ -24,7 +24,7 @@ def constants() -> list:
     alpha1R = 0.01
     muB     = 0.001
     sE      = 0.02
-    Tnaive  = 1e3
+    Tnaive  = 1e2
     muE     = 0.02
     sR      = 0.2
     alpha2R = 0.01
@@ -40,7 +40,7 @@ def constants_with_names() -> list:
     constants_list = [        
         ("RG", 0.003),
         ("kG", 0.1),
-        ("muG", 0.001),
+        ("muG", 0.003/100),
         ("alphaI", 0.1),
         ("muI", 0.001),
         ("alphaG", 0.01),
@@ -74,6 +74,7 @@ def system(t: np.float64, y: np.ndarray, *constants) -> np.ndarray:
     B       = y[2]
     Te      = y[3]
     Treg    = y[4]
+    
     # constants
     RG      = constants[0]
     kG      = constants[1]

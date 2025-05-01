@@ -5,7 +5,7 @@ import numpy as np
 
 def initial_values() -> np.ndarray:
     G_0   = 80
-    I_0   = 20     
+    I_0   = 10     
     B_0   = 300
     Te_0  = 0
     Treg_0= 0
@@ -13,16 +13,16 @@ def initial_values() -> np.ndarray:
     return np.array((G_0, I_0, B_0, Te_0, Treg_0))
 
 def constants() -> list:
-    RG      = 1.
-    kG      = 0.05 #0.72
+    RG      = 2. # 1.
+    kG      = 0.005  #0.05 #0.72
     muG     = 0.01
     alphaI  = 0.01
-    muI     = 1
-    alphaG  = 0.01
+    muI     = 0.8
+    alphaB  = 0.01
     kB      = 0.0001
     alphaE  = 0.01
     alpha1R = 0.01
-    muB     = 0.5
+    muB     = 0.8 #0.5
     sE      = 0.0002*0
     Tnaive  = 1e6
     muE     = 0.02
@@ -31,7 +31,7 @@ def constants() -> list:
     muR     = 0.001
 
     return (RG, kG, muG, alphaI, 
-            muI, alphaG, kB, alphaE,
+            muI, alphaB, kB, alphaE,
             alpha1R, muB, sE, Tnaive, 
             muE, sR, alpha2R, muR)
 
@@ -43,7 +43,7 @@ def constants_with_names() -> list:
         ("muG", 0.003/100),
         ("alphaI", 0.1),
         ("muI", 0.001),
-        ("alphaG", 0.01),
+        ("alphaB", 0.01),
         ("kB", 0.04),
         ("alphaE", 0.01),
         ("alpha1R", 0.01),
@@ -81,7 +81,7 @@ def system(t: np.float64, y: np.ndarray, *constants) -> np.ndarray:
     muG     = constants[2]
     alphaI  = constants[3]
     muI     = constants[4]
-    alphaG  = constants[5]
+    alphaB  = constants[5]
     kB      = constants[6]
     alphaE  = constants[7]
     alpha1R = constants[8]
@@ -97,9 +97,9 @@ def system(t: np.float64, y: np.ndarray, *constants) -> np.ndarray:
     #Sistema de EDOs
     #dGdt = RG -kG*I*G -muG*G      #atualiza o termo I*G
     Gmax = 85
-    dGdt = RG*(Gmax - G) -kG*I*G -muG*G
+    dGdt = RG -kG*I*G -muG*G
     dIdt = alphaI*B -muI*I
-    dBdt = alphaG*G*B -((kB*B*Te)/((1+alphaE*Te) + (alpha1R*Treg))) -muB*B
+    dBdt = alphaB*G*B -((kB*B*Te)/((1+alphaE*Te) + (alpha1R*Treg))) -muB*B
     dTedt = sE*(Tnaive - Te) -muE*Te*Treg #retira o TE de  sE*Te
     dTregdt = ((sR*Te)/(1+alpha2R*Treg)) -muR*Treg
 

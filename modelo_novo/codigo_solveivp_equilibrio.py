@@ -4,6 +4,8 @@ import numpy as np
 
 
 def initial_values() -> np.ndarray:
+    global B_0
+
     G_0   = 80
     I_0   = 12     
     B_0   = 980 #300
@@ -13,22 +15,24 @@ def initial_values() -> np.ndarray:
     return np.array((G_0, I_0, B_0, Te_0, Treg_0))
 
 def constants() -> list:
+    global factor 
     RG      = 8. # 1.
     kG      = 0.008  #0.05 #0.72
     muG     = 0.001
     alphaI  = 0.01
     muI     = 0.8
-    alphaB  = 0.5
-    kB      = 0.4
+    alphaB  = 0.4
+    kB      = 0.8
     alphaE  = 0.01
-    alpha1R = 0.01
+    alpha1R = 0.04
     muB     = 0.3 #0.5
-    sE      = 0.002*0
+    sE      = 0.05
     Tnaive  = 1e4
-    muE     = 0.02
-    sR      = 0.2*0
+    muE     = 0.005
+    sR      = 0.001
     alpha2R = 0.1
-    muR     = 0.001
+    muR     = 0.01
+    factor = 1.0 
 
     return (RG, kG, muG, alphaI, 
             muI, alphaB, kB, alphaE,
@@ -92,8 +96,14 @@ def system(t: np.float64, y: np.ndarray, *constants) -> np.ndarray:
     sR      = constants[13]
     alpha2R = constants[14]
     muR     = constants[15]
+    global factor, B_0
+    if B/B_0 <= 0.2: 
+        print('Limiar atingido')
+        factor = 20.0
 
-
+    sR = sR*factor
+    muE = muE*factor
+    
     #Sistema de EDOs
     #dGdt = RG -kG*I*G -muG*G      #atualiza o termo I*G
     #Gmax = 85

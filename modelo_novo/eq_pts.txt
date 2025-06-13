@@ -1,0 +1,10 @@
+Pontos de equilíbrio encontrados:
+
+G = (muI*(RG*alphaB - muB*muG) - sqrt(muI*(RG**2*alphaB**2*muI + 4000*RG*alphaB*alphaI*kG*muB + 2*RG*alphaB*muB*muG*muI + muB**2*muG**2*muI)))/(2*alphaB*(1000*alphaI*kG + muG*muI))
+B = 1000*(muI*(RG*alphaB - muB*muG) - sqrt(muI*(RG**2*alphaB**2*muI + 4000*RG*alphaB*alphaI*kG*muB + 2*RG*alphaB*muB*muG*muI + muB**2*muG**2*muI)))/(2*muB*(1000*alphaI*kG + muG*muI) + muI*(RG*alphaB - muB*muG) - sqrt(muI*(RG**2*alphaB**2*muI + 4000*RG*alphaB*alphaI*kG*muB + 2*RG*alphaB*muB*muG*muI + muB**2*muG**2*muI)))
+I = 1000*alphaI*(RG*alphaB*muI - muB*muG*muI - sqrt(muI*(RG**2*alphaB**2*muI + 4000*RG*alphaB*alphaI*kG*muB + 2*RG*alphaB*muB*muG*muI + muB**2*muG**2*muI)))/(muI*(RG*alphaB*muI + 2000*alphaI*kG*muB + muB*muG*muI - sqrt(muI*(RG**2*alphaB**2*muI + 4000*RG*alphaB*alphaI*kG*muB + 2*RG*alphaB*muB*muG*muI + muB**2*muG**2*muI))))
+----------------------------------------
+G = (muI*(RG*alphaB - muB*muG) + sqrt(muI*(RG**2*alphaB**2*muI + 4000*RG*alphaB*alphaI*kG*muB + 2*RG*alphaB*muB*muG*muI + muB**2*muG**2*muI)))/(2*alphaB*(1000*alphaI*kG + muG*muI))
+B = 1000*(muI*(RG*alphaB - muB*muG) + sqrt(muI*(RG**2*alphaB**2*muI + 4000*RG*alphaB*alphaI*kG*muB + 2*RG*alphaB*muB*muG*muI + muB**2*muG**2*muI)))/(2*muB*(1000*alphaI*kG + muG*muI) + muI*(RG*alphaB - muB*muG) + sqrt(muI*(RG**2*alphaB**2*muI + 4000*RG*alphaB*alphaI*kG*muB + 2*RG*alphaB*muB*muG*muI + muB**2*muG**2*muI)))
+I = 1000*alphaI*(RG*alphaB*muI - muB*muG*muI + sqrt(muI*(RG**2*alphaB**2*muI + 4000*RG*alphaB*alphaI*kG*muB + 2*RG*alphaB*muB*muG*muI + muB**2*muG**2*muI)))/(muI*(RG*alphaB*muI + 2000*alphaI*kG*muB + muB*muG*muI + sqrt(muI*(RG**2*alphaB**2*muI + 4000*RG*alphaB*alphaI*kG*muB + 2*RG*alphaB*muB*muG*muI + muB**2*muG**2*muI))))
+----------------------------------------

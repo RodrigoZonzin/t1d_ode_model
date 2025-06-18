@@ -7,23 +7,6 @@ from matplotlib import colormaps
 import pandas as pd
 import os 
 
-
-def system(t, y, params): 
-    #variaveis
-    G = y[0]
-    I = y[1]
-    B = y[2]
-
-    #parametros 
-    RG, kG, muG, alphaI, muI, alphaB, muB = list(params.values())
-     
-    #equacoes 
-    dGdt = RG-kG*I-muG*G
-    dIdt = alphaI*B - muI*I
-    dBdt = alphaB*G*(1000-B) - muB*B
-
-    return [dGdt, dIdt, dBdt]
-
 #valores iniciais
 G_0 = 80
 I_0 = 12
@@ -33,20 +16,44 @@ y0 = [G_0, I_0, B_0]
 t_range = (0, 250)
 t_eval = np.linspace(*t_range, int(250/0.1))  #dt =0.5
 
+def system(t, y, params): 
+    #variaveis
+    G = y[0]
+    I = y[1]
+    B = y[2]
+
+    #parametros 
+    RG, kG, muG, alphaI, sI, muI, alphaB, muB = list(params.values())
+     
+    #equacoes 
+    dGdt = RG-kG*I-muG*G
+    dIdt = (sI*B*G*G)/(1+G*G) - muI*I
+    dBdt = alphaB*G*(1000-B) - muB*B
+
+    return [dGdt, dIdt, dBdt]
+
 params = {
     #dGdt=RG-kG*I-muG*G
-    'RG': 5,
-    'kG': 0.008,
+    'RG': 1,
+    'kG': 0.005,
     'muG': 0.01125,
 
     #dIdt = alphaI*B - muI*I
     'alphaI': 0.01,
+    'sI': 0.02,
     'muI': 0.8,
     
     #dBdt = alphaB*G*(1000-B) - muB*B
     'alphaB': 0.4,
     'muB': 0.3
 }
+
+#parametros para texto
+def params_to_str(p): 
+    texto = ''
+    for k, v in p.items(): 
+        texto = texto+ f'{k}: {v}\n'
+    return texto
 
 #resolvendo o sistema
 sol = solve_ivp(
@@ -95,5 +102,11 @@ with PdfPages('results/resultados_EDO.pdf') as pdf:
     plt.savefig('results/resultadosHomeostase.png', dpi = 400)
     plt.close
         
+    plt.figure(figsize=(10,8), dpi = 400)
+    plt.text(0.1, 0.9, params_to_str(params), fontsize=12, va='top', ha='left', wrap=True)
+    plt.axis('off')
+    pdf.savefig()
+    plt.close()
+
 #salvando os resultados 
 df_results.to_csv('results/resultados_EDO.csv', index=True) #se Index=True, salva o dt na primeira coluna do .csv

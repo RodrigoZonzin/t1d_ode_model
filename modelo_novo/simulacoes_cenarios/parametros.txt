@@ -1,11 +1,25 @@
 ## Parâmetros para a homeostase das populações G, I e B 
-RG =            1,
-kG =            0.008,
-muG =           0.01125,
-alphaI =        0.01,
-muI =           0.8,
-alphaB =        0.4
-muB =           0.3
+#dGdt=RG-kG*I-muG*G
+#dIdt = alphaI*B - muI*I
+#dBdt = alphaB*G*(1000-B) - muB*B
+    RG              1,
+    kG              0.008,
+    muG             0.01125,
+    alphaI          0.01,
+    muI             0.8,
+    alphaB          0.4
+    muB             0.3
 
-
+## Parâmetros para a homeostase das populações G, I e B 
+#dGdt=RG-kG*I-muG*G
+#dIdt = (sI*B*G*G)/(1+G*G) - muI*I      mudei a EDO de I
+#dBdt = alphaB*G*(1000-B) - muB*B
+    RG              1
+    kG              0.005,
+    muG             0.01125,
+    alphaI          0.01,
+    sI              0.02,
+    muI             0.8,
+    alphaB          0.4,
+    muB             0.3
 

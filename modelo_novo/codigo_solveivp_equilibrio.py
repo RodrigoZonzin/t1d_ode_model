@@ -16,42 +16,42 @@ def initial_values() -> np.ndarray:
 
 def constants() -> list:
     global factor 
-    #RG      = 8. # 1.
-    #kG      = 0.008  #0.05 #0.72
-    #muG     = 0.001
-    #alphaI  = 0.01
-    #muI     = 0.8
-    #alphaB  = 0.4
-    #kB      = 0.8
-    #alphaE  = 0.01
-    #alpha1R = 0.04
-    #muB     = 0.3 #0.5
-    #sE      = 0.05
-    #Tnaive  = 1e4
-    #muE     = 0.005
-    #sR      = 0.001
-    #alpha2R = 0.1
-    #muR     = 0.01
-    #factor = 1.0 
-
-    RG          = 6.67004958e-01
-    kG          = 3.33625877e+00
-    muG         = 6.70064925e-03
-    alphaI      = 3.39629757e+00
-    muI         = 6.67218551e-02
-    alphaB      = 1.49431645e-04
-    muB         = 3.33625823e+00
-    kB      = 0.0
+    RG      = 8. # 1.
+    kG      = 0.008  #0.05 #0.72
+    muG     = 0.001
+    alphaI  = 0.01
+    muI     = 0.8
+    alphaB  = 0.4
+    kB      = 0.8
     alphaE  = 0.01
     alpha1R = 0.04
     muB     = 0.3 #0.5
-    sE      = 0.0
+    sE      = 0.05
     Tnaive  = 1e4
     muE     = 0.005
-    sR      = 0.00
+    sR      = 0.001
     alpha2R = 0.1
     muR     = 0.01
     factor = 1.0 
+
+    #RG          = 6.67004958e-01
+    #kG          = 3.33625877e+00
+    #muG         = 6.70064925e-03
+    #alphaI      = 3.39629757e+00
+    #muI         = 6.67218551e-02
+    #alphaB      = 1.49431645e-04
+    #muB         = 3.33625823e+00
+    #kB      = 0.0
+    #alphaE  = 0.01
+    #alpha1R = 0.04
+    #muB     = 0.3 #0.5
+    #sE      = 0.0
+    #Tnaive  = 1e4
+    #muE     = 0.005
+    #sR      = 0.00
+    #alpha2R = 0.1
+    #muR     = 0.01
+    #factor = 1.0 
 
     return (RG, kG, muG, alphaI, 
             muI, alphaB, kB, alphaE,

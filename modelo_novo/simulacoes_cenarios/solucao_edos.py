@@ -35,7 +35,7 @@ t_eval = np.linspace(*t_range, int(250/0.1))  #dt =0.5
 
 params = {
     #dGdt=RG-kG*I-muG*G
-    'RG': 1,
+    'RG': 5,
     'kG': 0.008,
     'muG': 0.01125,
 
@@ -83,14 +83,16 @@ with PdfPages('results/resultados_EDO.pdf') as pdf:
         plt.tight_layout()
 
         pdf.savefig() 
+        plt.savefig(f'results/resultadosHomeostase_{nome}.png')
         plt.close()   
 
     #plotando todas as curvas na ultima pagina
-    plt.figure(figsize=(10,3), dpi = 400)
+    plt.figure(figsize=(15,5), dpi = 400)
     [plt.plot(sol.t, sol.y[j], label = nome, color = mycolors[j]) for j, nome in enumerate(nomesVar)]
     plt.legend()
     plt.tight_layout()
     pdf.savefig()
+    plt.savefig('results/resultadosHomeostase.png', dpi = 400)
     plt.close
         
 #salvando os resultados 

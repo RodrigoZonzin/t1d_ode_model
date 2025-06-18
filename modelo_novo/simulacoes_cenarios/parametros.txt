@@ -1,0 +1,11 @@
+## Parâmetros para a homeostase das populações G, I e B 
+RG =            1,
+kG =            0.008,
+muG =           0.01125,
+alphaI =        0.01,
+muI =           0.8,
+alphaB =        0.4
+muB =           0.3
+
+
+

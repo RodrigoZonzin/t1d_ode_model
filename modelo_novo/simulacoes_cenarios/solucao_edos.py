@@ -10,11 +10,11 @@ import os
 #valores iniciais
 G_0 = 80
 I_0 = 12
-B_0 = 980
+B_0 = 800 #980
 y0 = [G_0, I_0, B_0]
 
-t_range = (0, 250)
-t_eval = np.linspace(*t_range, int(250/0.1))  #dt =0.5
+t_range = (0, 500)
+t_eval = np.linspace(*t_range, int(500/0.1))  #dt =0.5
 
 def system(t, y, params): 
     #variaveis
@@ -23,29 +23,31 @@ def system(t, y, params):
     B = y[2]
 
     #parametros 
-    RG, kG, muG, alphaI, sI, muI, alphaB, muB = list(params.values())
+    RG, kG, muG, alphaI, sI, muI, alphaB, muB, sigmaI, sigmaB = list(params.values())
      
     #equacoes 
-    dGdt = RG-kG*I-muG*G
-    dIdt = (sI*B*G*G)/(1+G*G) - muI*I
-    dBdt = alphaB*G*(1000-B) - muB*B
+    dGdt = RG*( np.exp(- ((t - 50)/50)**2) + 1.0) - kG*I*G - muG*G
+    dIdt = (sI*B*G*G)/(1 + G*G) - muI*I
+    dBdt = alphaB*G*B/(1 + sigmaB*B + sigmaI*I) - muB*B 
 
     return [dGdt, dIdt, dBdt]
 
 params = {
     #dGdt=RG-kG*I-muG*G
-    'RG': 1,
+    'RG': 5.0,
     'kG': 0.005,
     'muG': 0.01125,
 
     #dIdt = alphaI*B - muI*I
     'alphaI': 0.01,
-    'sI': 0.02,
-    'muI': 0.8,
+    'sI': 0.008,
+    'muI': 0.6,
     
     #dBdt = alphaB*G*(1000-B) - muB*B
-    'alphaB': 0.4,
-    'muB': 0.3
+    'alphaB': 0.4, #0.4,
+    'muB': 0.3, #0.3,
+    'sigmaI': 0.2, 
+    'sigmaB': 0.15, 
 }
 
 #parametros para texto

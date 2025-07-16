@@ -44,8 +44,8 @@ params = {
     'muI': 0.6,
     
     #dBdt = alphaB*G*(1000-B) - muB*B
-    'alphaB': 0.4, #0.4,
-    'muB': 0.3, #0.3,
+    'alphaB': 0.25, #0.4, #0.4,
+    'muB': 0.2, #0.3,
     'sigmaI': 0.2, 
     'sigmaB': 0.15, 
 }
@@ -79,7 +79,7 @@ cmap_vir = colormaps['viridis']
 mycolors = cmap_vir(np.linspace(0, 1, len(nomesVar)+2))
 
 
-with PdfPages('results/resultados_EDO.pdf') as pdf:
+with PdfPages('results2/resultadosEG_EDO.pdf') as pdf:
     #plotando cada curva numa pagina
     for i, nome in enumerate(nomesVar):
         plt.figure(figsize=(10,8)) 
@@ -92,7 +92,7 @@ with PdfPages('results/resultados_EDO.pdf') as pdf:
         plt.tight_layout()
 
         pdf.savefig() 
-        plt.savefig(f'results/resultadosHomeostase_{nome}.png')
+        plt.savefig(f'results2/resultadosEstresseGlicemico_{nome}.png')
         plt.close()   
 
     #plotando todas as curvas na ultima pagina
@@ -101,7 +101,7 @@ with PdfPages('results/resultados_EDO.pdf') as pdf:
     plt.legend()
     plt.tight_layout()
     pdf.savefig()
-    plt.savefig('results/resultadosHomeostase.png', dpi = 400)
+    plt.savefig('results2/resultadosEstresseGlicemico.png', dpi = 400)
     plt.close
         
     plt.figure(figsize=(10,8), dpi = 400)
@@ -111,4 +111,4 @@ with PdfPages('results/resultados_EDO.pdf') as pdf:
     plt.close()
 
 #salvando os resultados 
-df_results.to_csv('results/resultados_EDO.csv', index=True) #se Index=True, salva o dt na primeira coluna do .csv
+df_results.to_csv('results2/resultadosEG_EDO.csv', index=True) #se Index=True, salva o dt na primeira coluna do .csv

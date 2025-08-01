@@ -5,13 +5,17 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.colors as mcolors
 from matplotlib import colormaps
 import pandas as pd
-import os 
+import os, sys 
+
+#nome arquivo de saida
+fout_name = sys.argv[1]
 
 #valores iniciais
 G_0 = 80
 I_0 = 12
 B_0 = 800 #980
-y0 = [G_0, I_0, B_0]
+T_0 = 1
+y0 = [G_0, I_0, B_0, T_0]
 
 t_range = (0, 500)
 t_eval = np.linspace(*t_range, int(500/0.1))  #dt =0.5
@@ -21,16 +25,20 @@ def system(t, y, params):
     G = y[0]
     I = y[1]
     B = y[2]
+    T = y[3]
 
     #parametros 
-    RG, kG, muG, alphaI, sI, muI, alphaB, muB, sigmaI, sigmaB = list(params.values())
+    RG, kG, muG, sI, muI, alphaB, muB, sigmaI, sigmaB, kB, alphaR, Tnaive, sE, muE = list(params.values())
      
     #equacoes 
-    dGdt = RG*( np.exp(- ((t - 50)/50)**2) + 1.0) - kG*I*G - muG*G
+    #dGdt = RG*( np.exp(- ((t - 50)/50)**2) + 1.0) - kG*I*G - muG*G
+    dGdt = RG - kG*I*G - muG*G
     dIdt = (sI*B*G*G)/(1 + G*G) - muI*I
-    dBdt = alphaB*G*B/(1 + sigmaB*B + sigmaI*I) - muB*B 
+    dBdt = alphaB*G*B/(1 + sigmaB*B + sigmaI*I) - muB*B -(kB*B*T)/(1+alphaR*T)
+    #print(t, sE, Tnaive, T, muE) if (t- 2.00 ) < 0.0000001 else 0+0
+    dTdt = sE*(Tnaive - T) -muE*T
 
-    return [dGdt, dIdt, dBdt]
+    return [dGdt, dIdt, dBdt, dTdt]
 
 params = {
     #dGdt=RG-kG*I-muG*G
@@ -38,16 +46,23 @@ params = {
     'kG': 0.005,
     'muG': 0.01125,
 
-    #dIdt = alphaI*B - muI*I
-    'alphaI': 0.01,
+    #dIdt = (sI*B*G*G)/(1 + G*G) - muI*I
     'sI': 0.008,
     'muI': 0.6,
     
-    #dBdt = alphaB*G*(1000-B) - muB*B
+    #dBdt = alphaB*G*(1000-B) - muB*B -(kB*B*T)/(1+alphaR*T) 
     'alphaB': 0.25, #0.4, #0.4,
     'muB': 0.2, #0.3,
     'sigmaI': 0.2, 
     'sigmaB': 0.15, 
+    'kB': 1,
+    'alphaR': 0.001,
+
+    #dTdt = sE*(Tnaive - T) -muE*T          #equação original dTdt = sE*(Tnaive - T) -muE*T*Treg, mas ainda nao temos TReg 
+    'Tnaive': 370,
+    'sE': 0.05, 
+    'muE': 0.001
+    
 }
 
 #parametros para texto
@@ -66,9 +81,9 @@ sol = solve_ivp(
 )
 
 #dataframe pra salvar os resultados
-df_results = pd.DataFrame(index = sol.t , columns=['Glicose', 'Insulina', 'Beta'])
+df_results = pd.DataFrame(index = sol.t , columns=['Glicose', 'Insulina', 'Beta', 'T'])
 
-nomesVar = ['Glicose', 'Insulina', 'Beta']
+nomesVar = ['Glicose', 'Insulina', 'Beta', 'T']
 for i, nome in enumerate(nomesVar):
     df_results[nome] = sol.y[i]
 
@@ -79,7 +94,7 @@ cmap_vir = colormaps['viridis']
 mycolors = cmap_vir(np.linspace(0, 1, len(nomesVar)+2))
 
 
-with PdfPages('results2/resultadosEG_EDO.pdf') as pdf:
+with PdfPages(f'results/{fout_name}.pdf') as pdf:
     #plotando cada curva numa pagina
     for i, nome in enumerate(nomesVar):
         plt.figure(figsize=(10,8)) 
@@ -92,7 +107,7 @@ with PdfPages('results2/resultadosEG_EDO.pdf') as pdf:
         plt.tight_layout()
 
         pdf.savefig() 
-        plt.savefig(f'results2/resultadosEstresseGlicemico_{nome}.png')
+        plt.savefig(f'results/{fout_name}_{nome}.png')
         plt.close()   
 
     #plotando todas as curvas na ultima pagina
@@ -101,7 +116,7 @@ with PdfPages('results2/resultadosEG_EDO.pdf') as pdf:
     plt.legend()
     plt.tight_layout()
     pdf.savefig()
-    plt.savefig('results2/resultadosEstresseGlicemico.png', dpi = 400)
+    plt.savefig(f'results/{fout_name}.png', dpi = 400)
     plt.close
         
     plt.figure(figsize=(10,8), dpi = 400)
@@ -111,4 +126,4 @@ with PdfPages('results2/resultadosEG_EDO.pdf') as pdf:
     plt.close()
 
 #salvando os resultados 
-df_results.to_csv('results2/resultadosEG_EDO.csv', index=True) #se Index=True, salva o dt na primeira coluna do .csv
+df_results.to_csv(f'results/{fout_name}.csv', index=True) #se Index=True, salva o dt na primeira coluna do .csv

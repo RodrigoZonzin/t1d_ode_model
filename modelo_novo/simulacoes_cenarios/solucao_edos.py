@@ -52,15 +52,15 @@ params = {
     
     #dBdt = alphaB*G*(1000-B) - muB*B -(kB*B*T)/(1+alphaR*T) 
     'alphaB': 0.25, #0.4, #0.4,
-    'muB': 0.2, #0.3,
+    'muB': 0.002, #0.3,
     'sigmaI': 0.2, 
     'sigmaB': 0.15, 
-    'kB': 1,
+    'kB': 0.95,
     'alphaR': 0.001,
 
     #dTdt = sE*(Tnaive - T) -muE*T          #equação original dTdt = sE*(Tnaive - T) -muE*T*Treg, mas ainda nao temos TReg 
     'Tnaive': 370,
-    'sE': 0.05, 
+    'sE': 0.0005, 
     'muE': 0.001
     
 }

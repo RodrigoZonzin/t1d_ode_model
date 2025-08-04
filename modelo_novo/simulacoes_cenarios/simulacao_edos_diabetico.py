@@ -40,31 +40,6 @@ def system(t, y, params):
 
     return [dGdt, dIdt, dBdt, dTdt]
 
-params = {
-    #dGdt=RG-kG*I-muG*G
-    'RG': 5.0,
-    'kG': 0.005,
-    'muG': 0.01125,
-
-    #dIdt = (sI*B*G*G)/(1 + G*G) - muI*I
-    'sI': 0.008,
-    'muI': 0.6,
-    
-    #dBdt = alphaB*G*(1000-B) - muB*B -(kB*B*T)/(1+alphaR*T) 
-    'alphaB': 0.25, #0.4, #0.4,
-    'muB': 0.2, #0.3,
-    'sigmaI': 0.2, 
-    'sigmaB': 0.15, 
-    'kB': 1,
-    'alphaR': 0.001,
-
-    #dTdt = sE*(Tnaive - T) -muE*T          #equação original dTdt = sE*(Tnaive - T) -muE*T*Treg, mas ainda nao temos TReg 
-    'Tnaive': 370,
-    'sE': 0.05, 
-    'muE': 0.001
-    
-}
-
 #parametros para texto
 def params_to_str(p): 
     texto = ''
@@ -72,27 +47,44 @@ def params_to_str(p):
         texto = texto+ f'{k}: {v}\n'
     return texto
 
-menores_glicose = []
-for kb in np.arange(0, 2.5, 0.1): 
-    
-    params['kB'] = kb
+# Parâmetros fixos
+base_params = {
+    'RG': 5.0, 'kG': 0.005, 'muG': 0.01125,
+    'sI': 0.008, 'muI': 0.6,
+    'alphaB': 0.25, 'muB': 0.2,
+    'sigmaI': 0.2, 'sigmaB': 0.15,
+    'kB': 1, 'alphaR': 0.001,
+    'Tnaive': 370, 'sE': 0.05, 'muE': 0.001
+}
 
-    #resolvendo o sistema
+kb_values = np.arange(0, 2.5, 0.1)
+alphaR_values = np.arange(0, 2.5, 0.1)
 
-    sol = solve_ivp(
-        fun=lambda t, y: system(t, y, params),
-        t_span=t_range,
-        y0=y0,
-        t_eval=t_eval
-    )
+heatmap_data = np.zeros((len(kb_values), len(alphaR_values)))
 
+for i, kb in enumerate(kb_values):
+    for j, alphaR in enumerate(alphaR_values):
+        params = base_params.copy()
+        params['kB'] = kb
+        params['kG'] = alphaR
 
-    results_glicose = sol.y[0]
-    results_Tcells  = sol.y[3]
+        sol = solve_ivp(
+            fun=lambda t, y: system(t, y, params),
+            t_span=t_range,
+            y0=y0,
+            t_eval=t_eval
+        )
 
-    menores_glicose.append(np.max(results_glicose))
-
+        beta_min = np.min(sol.y[2])
+        heatmap_data[i, j] = beta_min
 
 plt.figure(figsize=(10, 8))
-plt.scatter(y = menores_glicose, x = np.arange(0, 2.5, 0.1))
-plt.savefig('results/testando_kbs.png', dpi = 400)
+plt.imshow(heatmap_data, origin='lower', aspect='auto', 
+           extent=[alphaR_values[0], alphaR_values[-1], kb_values[0], kb_values[-1]],
+           cmap='viridis')
+plt.colorbar(label='Minimo de Beta')
+plt.xlabel(rf'$\alpha_R$')
+plt.ylabel(rf'$k_B$')
+plt.tight_layout()
+plt.savefig('results/heatmap_kB_kG_beta.png', dpi=300)
+#plt.show()

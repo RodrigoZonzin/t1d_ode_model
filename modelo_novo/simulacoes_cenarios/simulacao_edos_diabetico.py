@@ -17,8 +17,8 @@ B_0 = 800 #980
 T_0 = 1
 y0 = [G_0, I_0, B_0, T_0]
 
-t_range = (0, 500)
-t_eval = np.linspace(*t_range, int(500/0.1))  #dt =0.5
+t_range = (0, 800)
+t_eval = np.linspace(*t_range, int(800/0.1))  #dt =0.5
 
 def system(t, y, params): 
     #variaveis
@@ -48,7 +48,7 @@ def params_to_str(p):
     return texto
 
 # Parâmetros fixos
-base_params = {
+params = {
     'RG': 5.0, 'kG': 0.005, 'muG': 0.01125,
     'sI': 0.008, 'muI': 0.6,
     'alphaB': 0.25, 'muB': 0.2,
@@ -57,34 +57,25 @@ base_params = {
     'Tnaive': 370, 'sE': 0.05, 'muE': 0.001
 }
 
-kb_values = np.arange(0, 2.5, 0.1)
-alphaR_values = np.arange(0, 2.5, 0.1)
+plt.figure(figsize=(10, 6), dpi = 400)
+linhas = ['-', '--', (0, (5, 2)), '-.', ':']
 
-heatmap_data = np.zeros((len(kb_values), len(alphaR_values)))
+#for i, se in enumerate(np.arange(0.00001, 0.00005, 0.00001)):
+for i, se in enumerate([0.00001, 0.00005, 0.0001, 0.0005, 0.005]):
+    params['sE'] = se
 
-for i, kb in enumerate(kb_values):
-    for j, alphaR in enumerate(alphaR_values):
-        params = base_params.copy()
-        params['kB'] = kb
-        params['kG'] = alphaR
+    sol = solve_ivp(
+        fun=lambda t, y: system(t, y, params),
+        t_span=t_range,
+        y0=y0,
+        t_eval=t_eval
+    )
 
-        sol = solve_ivp(
-            fun=lambda t, y: system(t, y, params),
-            t_span=t_range,
-            y0=y0,
-            t_eval=t_eval
-        )
+    plt.plot(sol.t, sol.y[3], label = rf'$s_E = {format(se, '.5f')}$', color = 'black', ls = linhas[i])
 
-        beta_min = np.min(sol.y[2])
-        heatmap_data[i, j] = beta_min
-
-plt.figure(figsize=(10, 8))
-plt.imshow(heatmap_data, origin='lower', aspect='auto', 
-           extent=[alphaR_values[0], alphaR_values[-1], kb_values[0], kb_values[-1]],
-           cmap='viridis')
-plt.colorbar(label='Minimo de Beta')
-plt.xlabel(rf'$\alpha_R$')
-plt.ylabel(rf'$k_B$')
+plt.legend()
 plt.tight_layout()
-plt.savefig('results/heatmap_kB_kG_beta.png', dpi=300)
+plt.savefig('impacto_sE_em_T.png', dpi = 400)
+print(np.min(sol.y[2]))
+
 #plt.show()

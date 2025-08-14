@@ -58,7 +58,9 @@ params = {
 }
 
 plt.figure(figsize=(10, 6), dpi = 400)
-linhas = ['-', '--', (0, (5, 2)), '-.', ':']
+linhas = ['-', ':', (0, (5, 2)), '-.', '--']
+cores   = colormaps['viridis']
+mcores = cores(np.linspace(0, 1, 10))
 
 #for i, se in enumerate(np.arange(0.00001, 0.00005, 0.00001)):
 for i, se in enumerate([0.00001, 0.00005, 0.0001, 0.0005, 0.005]):
@@ -71,11 +73,11 @@ for i, se in enumerate([0.00001, 0.00005, 0.0001, 0.0005, 0.005]):
         t_eval=t_eval
     )
 
-    plt.plot(sol.t, sol.y[3], label = rf'$s_E = {format(se, '.5f')}$', color = 'black', ls = linhas[i])
+    plt.plot(sol.t, sol.y[2], label = rf'$s_E = {format(se, '.5f')}$', color = mcores[i], ls = linhas[i])
 
 plt.legend()
 plt.tight_layout()
-plt.savefig('impacto_sE_em_T.png', dpi = 400)
+plt.savefig('impacto_sE_em_B_2.png', dpi = 400)
 print(np.min(sol.y[2]))
 
 #plt.show()

@@ -14,7 +14,7 @@ fout_name = sys.argv[1]
 G_0     = 80
 I_0     = 12
 B_0     = 800 #980
-T_0     = 0
+T_0     = 1
 TReg_0  = 0
 y0 = [G_0, I_0, B_0, T_0, TReg_0]
 
@@ -33,7 +33,7 @@ def system(t, y, params):
     RG, kG, muG, sI, muI, alphaB, muB, sigmaI, sigmaB, k_B, alpha_Te, k_Te, m_te, s_treg, sigma_treg, m_treg = list(params.values())
      
     #equacoes 
-    #dGdt = RG*( np.exp(- ((t - 50)/50)**2) + np.exp(- ((t - 200)/200)**2)  + 1.0) - kG*I*G - muG*G
+    #dGdt = RG*( np.exp(- ((t - 50)/50)**2) + 1) - kG*I*G - muG*G
     dGdt = RG -kG*I*G -muG*G
     dIdt = (sI*B*G*G)/(1 + G*G) - muI*I
     dBdt = alphaB*G*B/(1 + sigmaB*B + sigmaI*I) - muB*B - k_B*B*Te
@@ -54,15 +54,15 @@ params = {
     
     #dBdt = alphaB*G*B/(1 + sigmaB*B + sigmaI*I) - muB*B - k_B*B*Te
     'alphaB': 0.39, #0.4,
-    'sigmaB': 0.15,
-    'sigmaI': 0.2, 
+    'sigmaB': 0.2,
+    'sigmaI': 0.15, 
     'muB': 0.25, #0.3,
-    'k_B': 0.07,
+    'k_B': 0.15,
 
     #dTedt = alpha_Te*B/(1 + Treg) - k_Te*Te*Treg - m_te*Te
-    'alpha_Te': 0.00,
+    'alpha_Te': 0.001,
     'k_Te': 0.2,
-    'm_te': 0.3,
+    'm_te': 0.01,
 
     #dTregdt = (s_treg*Te)/(1 + sigma_treg*Treg) -m_treg*Treg
     's_treg': 0.0, 

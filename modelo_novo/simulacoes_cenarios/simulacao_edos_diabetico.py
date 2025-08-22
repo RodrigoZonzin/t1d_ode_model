@@ -18,29 +18,29 @@ T_0 = 1
 TReg_0 = 1
 y0 = [G_0, I_0, B_0, T_0, TReg_0]
 
-t_range = (0, 800)
-t_eval = np.linspace(*t_range, int(800/0.1))  #dt =0.5
+t_range = (0, 100)
+t_eval = np.linspace(*t_range, int(100/0.1))  #dt =0.5
 
 def system(t, y, params): 
     #variaveis
-    G = y[0]
-    I = y[1]
-    B = y[2]
-    T = y[3]
-    TReg = y[3]
+    G   = y[0]
+    I   = y[1]
+    B   = y[2]
+    Te  = y[3]
+    Treg = y[4]
 
     #parametros 
-    RG, kG, muG, sI, muI, alphaB, muB, sigmaI, sigmaB, kB, alphaR, Tnaive, sE, muE = list(params.values())
+    RG, kG, muG, sI, muI, alphaB, muB, sigmaI, sigmaB, k_B, alpha_Te, k_Te, m_te, s_treg, sigma_treg, m_treg = list(params.values())
      
     #equacoes 
-    #dGdt = RG*( np.exp(- ((t - 50)/50)**2) + 1.0) - kG*I*G - muG*G
-    dGdt = RG - kG*I*G - muG*G
+    #dGdt = RG*( np.exp(- ((t - 50)/50)**2) + 1) - kG*I*G - muG*G
+    dGdt = RG -kG*I*G -muG*G
     dIdt = (sI*B*G*G)/(1 + G*G) - muI*I
-    dBdt = alphaB*G*B/(1 + sigmaB*B + sigmaI*I) - muB*B -(kB*B*T)/(1+alphaR*T)
-    #print(t, sE, Tnaive, T, muE) if (t- 2.00 ) < 0.0000001 else 0+0
-    dTdt = sE*(Tnaive - T) -muE*T
+    dBdt = alphaB*G*B/(1 + sigmaB*B + sigmaI*I) - muB*B - k_B*B*Te
+    dTedt = alpha_Te*B/(1 + Treg) - k_Te*Te*Treg - m_te*Te
+    dTregdt = (s_treg*Te)/(1 + sigma_treg*Treg) -m_treg*Treg
 
-    return [dGdt, dIdt, dBdt, dTdt]
+    return [dGdt, dIdt, dBdt, dTedt, dTregdt]
 
 #parametros para texto
 def params_to_str(p): 
@@ -49,14 +49,32 @@ def params_to_str(p):
         texto = texto+ f'{k}: {v}\n'
     return texto
 
-# Parâmetros fixos
 params = {
-    'RG': 5.0, 'kG': 0.005, 'muG': 0.01125,
-    'sI': 0.008, 'muI': 0.6,
-    'alphaB': 0.25, 'muB': 0.2,
-    'sigmaI': 0.2, 'sigmaB': 0.15,
-    'kB': 1, 'alphaR': 0.001,
-    'Tnaive': 370, 'sE': 0.05, 'muE': 0.001
+    #dGdt=RG-kG*I-muG*G
+    'RG': 5.0,
+    'kG': 0.0049,
+    'muG': 0.01125,
+
+    #dIdt = (sI*B*G*G)/(1 + G*G) - muI*I
+    'sI': 0.005,
+    'muI': 0.34,
+    
+    #dBdt = alphaB*G*B/(1 + sigmaB*B + sigmaI*I) - muB*B - k_B*B*Te
+    'alphaB': 0.39, #0.4,
+    'sigmaB': 0.2,
+    'sigmaI': 0.15, 
+    'muB': 0.25, #0.3,
+    'k_B': 0.15,
+
+    #dTedt = alpha_Te*B/(1 + Treg) - k_Te*Te*Treg - m_te*Te
+    'alpha_Te': 0.5,
+    'k_Te': 0.2,
+    'm_te': 0.01,
+
+    #dTregdt = (s_treg*Te)/(1 + sigma_treg*Treg) -m_treg*Treg
+    's_treg': 0.0, 
+    'sigma_treg': 0.05,
+    'm_treg': 0.1
 }
 
 plt.figure(figsize=(10, 6), dpi = 400)
@@ -65,8 +83,9 @@ cores   = colormaps['viridis']
 mcores = cores(np.linspace(0, 1, 10))
 
 #for i, se in enumerate(np.arange(0.00001, 0.00005, 0.00001)):
-for i, se in enumerate([0.00001, 0.00005, 0.0001, 0.0005, 0.005]):
-    params['sE'] = se
+#for i, kB in enumerate([0.01, 0.05, 0.15, 0.60, 0.98]):
+for i, alpha in enumerate([0.01, 0.1, 0.25, 0.60, 0.98]):
+    params['alpha_Te'] = alpha
 
     sol = solve_ivp(
         fun=lambda t, y: system(t, y, params),
@@ -75,11 +94,12 @@ for i, se in enumerate([0.00001, 0.00005, 0.0001, 0.0005, 0.005]):
         t_eval=t_eval
     )
 
-    plt.plot(sol.t, sol.y[2], label = rf'$s_E = {format(se, '.5f')}$', color = mcores[i], ls = linhas[i])
+    plt.plot(sol.t, sol.y[2], label = rf'$\alpha_{{TE}} = {alpha:.2f}$', color = mcores[i], ls = linhas[i])
+
 
 plt.legend()
 plt.tight_layout()
-plt.savefig('impacto_sE_em_B_2.png', dpi = 400)
+plt.savefig('impacto_alphaTe_em_B.png', dpi = 400)
 print(np.min(sol.y[2]))
 
 #plt.show()

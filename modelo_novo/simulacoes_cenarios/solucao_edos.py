@@ -11,58 +11,63 @@ import os, sys
 fout_name = sys.argv[1]
 
 #valores iniciais
-G_0 = 80
-I_0 = 12
-B_0 = 800 #980
-T_0 = 1
-y0 = [G_0, I_0, B_0, T_0]
+G_0     = 80
+I_0     = 12
+B_0     = 800 #980
+T_0     = 0
+TReg_0  = 0
+y0 = [G_0, I_0, B_0, T_0, TReg_0]
 
-t_range = (0, 500)
-t_eval = np.linspace(*t_range, int(500/0.1))  #dt =0.5
+t_range = (0, 800)
+t_eval = np.linspace(*t_range, int(800/0.1))  #dt =0.5
 
 def system(t, y, params): 
     #variaveis
-    G = y[0]
-    I = y[1]
-    B = y[2]
-    T = y[3]
+    G   = y[0]
+    I   = y[1]
+    B   = y[2]
+    Te  = y[3]
+    Treg = y[4]
 
     #parametros 
-    RG, kG, muG, sI, muI, alphaB, muB, sigmaI, sigmaB, kB, alphaR, Tnaive, sE, muE = list(params.values())
+    RG, kG, muG, sI, muI, alphaB, muB, sigmaI, sigmaB, k_B, alpha_Te, k_Te, m_te, s_treg, sigma_treg, m_treg = list(params.values())
      
     #equacoes 
-    #dGdt = RG*( np.exp(- ((t - 50)/50)**2) + 1.0) - kG*I*G - muG*G
-    dGdt = RG - kG*I*G - muG*G
+    #dGdt = RG*( np.exp(- ((t - 50)/50)**2) + np.exp(- ((t - 200)/200)**2)  + 1.0) - kG*I*G - muG*G
+    dGdt = RG -kG*I*G -muG*G
     dIdt = (sI*B*G*G)/(1 + G*G) - muI*I
-    dBdt = alphaB*G*B/(1 + sigmaB*B + sigmaI*I) - muB*B -(kB*B*T)/(1+alphaR*T)
-    #print(t, sE, Tnaive, T, muE) if (t- 2.00 ) < 0.0000001 else 0+0
-    dTdt = sE*(Tnaive - T) -muE*T
+    dBdt = alphaB*G*B/(1 + sigmaB*B + sigmaI*I) - muB*B - k_B*B*Te
+    dTedt = alpha_Te*B/(1 + Treg) - k_Te*Te*Treg - m_te*Te
+    dTregdt = (s_treg*Te)/(1 + sigma_treg*Treg) -m_treg*Treg
 
-    return [dGdt, dIdt, dBdt, dTdt]
+    return [dGdt, dIdt, dBdt, dTedt, dTregdt]
 
 params = {
     #dGdt=RG-kG*I-muG*G
     'RG': 5.0,
-    'kG': 0.005,
+    'kG': 0.0049,
     'muG': 0.01125,
 
     #dIdt = (sI*B*G*G)/(1 + G*G) - muI*I
-    'sI': 0.008,
-    'muI': 0.6,
+    'sI': 0.005,
+    'muI': 0.34,
     
-    #dBdt = alphaB*G*(1000-B) - muB*B -(kB*B*T)/(1+alphaR*T) 
-    'alphaB': 0.25, #0.4, #0.4,
-    'muB': 0.002, #0.3,
+    #dBdt = alphaB*G*B/(1 + sigmaB*B + sigmaI*I) - muB*B - k_B*B*Te
+    'alphaB': 0.39, #0.4,
+    'sigmaB': 0.15,
     'sigmaI': 0.2, 
-    'sigmaB': 0.15, 
-    'kB': 0.95,
-    'alphaR': 0.001,
+    'muB': 0.25, #0.3,
+    'k_B': 0.07,
 
-    #dTdt = sE*(Tnaive - T) -muE*T          #equação original dTdt = sE*(Tnaive - T) -muE*T*Treg, mas ainda nao temos TReg 
-    'Tnaive': 370,
-    'sE': 0.0005, 
-    'muE': 0.001
-    
+    #dTedt = alpha_Te*B/(1 + Treg) - k_Te*Te*Treg - m_te*Te
+    'alpha_Te': 0.00,
+    'k_Te': 0.2,
+    'm_te': 0.3,
+
+    #dTregdt = (s_treg*Te)/(1 + sigma_treg*Treg) -m_treg*Treg
+    's_treg': 0.0, 
+    'sigma_treg': 0.05,
+    'm_treg': 0.1
 }
 
 #parametros para texto
@@ -81,9 +86,11 @@ sol = solve_ivp(
 )
 
 #dataframe pra salvar os resultados
-df_results = pd.DataFrame(index = sol.t , columns=['Glicose', 'Insulina', 'Beta', 'T'])
+nomesVar = ['Glicose', 'Insulina', 'Beta', 'T', 'TReg']
 
-nomesVar = ['Glicose', 'Insulina', 'Beta', 'T']
+df_results = pd.DataFrame(index = sol.t , columns=nomesVar)
+
+
 for i, nome in enumerate(nomesVar):
     df_results[nome] = sol.y[i]
 
@@ -97,12 +104,13 @@ mycolors = cmap_vir(np.linspace(0, 1, len(nomesVar)+2))
 with PdfPages(f'results/{fout_name}.pdf') as pdf:
     #plotando cada curva numa pagina
     for i, nome in enumerate(nomesVar):
-        plt.figure(figsize=(10,8)) 
-        plt.plot(sol.t, sol.y[i], label=nome, color=mycolors[i])
+        plt.figure(figsize=(8,6)) 
+        plt.plot(sol.t, sol.y[i], label=nome, color=mycolors[i], lw = 2)
         #plt.ylim(bottom=0)
         plt.xlabel('Tempo')
         plt.ylabel('Concentração')
-        plt.title(f'Evolução da {nome}')
+        #plt.title(f'Evolução da {nome}')
+        plt.tick_params(axis='both', which='major', labelsize=12)
         plt.legend()
         plt.tight_layout()
 
@@ -111,15 +119,18 @@ with PdfPages(f'results/{fout_name}.pdf') as pdf:
         plt.close()   
 
     #plotando todas as curvas na ultima pagina
-    plt.figure(figsize=(15,5), dpi = 400)
-    [plt.plot(sol.t, sol.y[j], label = nome, color = mycolors[j]) for j, nome in enumerate(nomesVar)]
+    plt.figure(figsize=(15,5), dpi = 500)
+    [plt.plot(sol.t, sol.y[j], label = nome, color = mycolors[j], lw = 2) for j, nome in enumerate(nomesVar)]
     plt.legend()
+    plt.xlabel('Tempo')
+    plt.ylabel('Concentração')
+    plt.tick_params(axis='both', which='major', labelsize=12)
     plt.tight_layout()
     pdf.savefig()
-    plt.savefig(f'results/{fout_name}.png', dpi = 400)
+    plt.savefig(f'results/{fout_name}.png', dpi = 500)
     plt.close
         
-    plt.figure(figsize=(10,8), dpi = 400)
+    plt.figure(figsize=(10,8), dpi = 500)
     plt.text(0.1, 0.9, params_to_str(params), fontsize=12, va='top', ha='left', wrap=True)
     plt.axis('off')
     pdf.savefig()

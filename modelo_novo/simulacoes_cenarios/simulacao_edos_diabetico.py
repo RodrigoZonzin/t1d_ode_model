@@ -15,7 +15,8 @@ G_0 = 80
 I_0 = 12
 B_0 = 800 #980
 T_0 = 1
-y0 = [G_0, I_0, B_0, T_0]
+TReg_0 = 1
+y0 = [G_0, I_0, B_0, T_0, TReg_0]
 
 t_range = (0, 800)
 t_eval = np.linspace(*t_range, int(800/0.1))  #dt =0.5
@@ -26,6 +27,7 @@ def system(t, y, params):
     I = y[1]
     B = y[2]
     T = y[3]
+    TReg = y[3]
 
     #parametros 
     RG, kG, muG, sI, muI, alphaB, muB, sigmaI, sigmaB, kB, alphaR, Tnaive, sE, muE = list(params.values())
